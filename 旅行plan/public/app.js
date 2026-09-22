@@ -20,6 +20,7 @@ let routePlayer = { active:false, segments:[], index:-1 };
 let routePlayerMarker = null, routePlayerLine = null, routePlayerFrame = 0;
 let mobileDrawerOpen = false;
 let mobileSheetOffset = null;
+let mobileMapFitTimer;
 const mobileSheetHandlePeek = 28;
 const isMobileLayout = () => window.matchMedia("(max-width: 760px)").matches;
 
@@ -62,6 +63,7 @@ function setMobileDrawer(open) {
   card.classList.toggle("drawer-open", open);
   card.classList.toggle("sheet-collapsed", !open);
   $("#mobileShowCard")?.classList.toggle("active", open);
+  if (isMobileLayout()) scheduleMobileMapFit();
 }
 function openRoutePreview() {
   const day = currentDay();
@@ -531,10 +533,25 @@ function allRelevantLocations() {
 function fitMap() {
   const targets = overview ? mapItems : activeMapItems;
   if (!targets.length || !map) return;
-  const avoid = isMobileLayout()
-    ? [18, 16, 132, 16]
-    : overview ? [72, 360, 70, 40] : [72, 380, 72, 48];
+  const avoid = isMobileLayout() ? mobileMapAvoid() : overview ? [72, 360, 70, 40] : [72, 380, 72, 48];
   map.setFitView(targets, false, avoid);
+}
+function mobileMapAvoid() {
+  const mapBounds = $("#map")?.getBoundingClientRect();
+  if (!mapBounds) return [18, 16, 132, 16];
+  const overlayTop = [$("#dayCard"), $("#mobileActionBar"), $(".map-legend")]
+    .map(element => element?.getBoundingClientRect())
+    .filter(rect => rect && rect.width > 0 && rect.height > 0 && rect.bottom > mapBounds.top && rect.top < mapBounds.bottom)
+    .map(rect => Math.max(mapBounds.top, rect.top));
+  const bottom = overlayTop.length
+    ? Math.max(96, Math.ceil(mapBounds.bottom - Math.min(...overlayTop) + 14))
+    : 96;
+  return [18, 16, bottom, 16];
+}
+function scheduleMobileMapFit() {
+  if (!map || !isMobileLayout() || overview) return;
+  clearTimeout(mobileMapFitTimer);
+  mobileMapFitTimer = setTimeout(() => { if (map && !overview) fitMap(); }, 270);
 }
 function syncMapControls() {
   const focused = !overview;
@@ -550,7 +567,7 @@ function syncMapControls() {
 function requestMapFitAfterMobileLayout() {
   requestAnimationFrame(() => {
     setMobileDrawer(false);
-    setTimeout(() => { if (map && !overview) fitMap(); }, 260);
+    scheduleMobileMapFit();
   });
 }
 function updateMapView() {

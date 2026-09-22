@@ -281,6 +281,7 @@ button { font: inherit; cursor: pointer; }
   .map-tools { max-width: calc(100% - 20px); padding: 7px 10px; }
   .map-tools #toggleMapFocus { display: none; }
   .mobile-action-bar button { background: #fff; color: #2b5745; }
+  .mobile-action-bar button:nth-child(2):not(.active) { border-color: #dbe3dc; background: #fff; color: #2b5745; }
   .mobile-action-bar button.active { border-color: var(--forest); background: var(--forest); color: #fff; }
   .mobile-action-bar button { min-height: 44px; touch-action: manipulation; }
   .map-tools button { min-height: 40px; touch-action: manipulation; }

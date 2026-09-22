@@ -542,18 +542,24 @@ function mobileMapAvoid() {
   if (!mapBounds) return [18, 16, 132, 16];
   const safe = 24;
   let top = 18, right = 16, bottom = 96, left = 16;
-  const overlays = [$(".map-tools"), $(".route-player"), $(".route-arrival"), $("#dayCard"), $("#mobileActionBar"), $(".map-legend")];
-  overlays.map(element => element?.getBoundingClientRect())
-    .filter(rect => rect && rect.width > 0 && rect.height > 0 && rect.right > mapBounds.left && rect.left < mapBounds.right && rect.bottom > mapBounds.top && rect.top < mapBounds.bottom)
-    .forEach(rect => {
-      const topInset = Math.max(0, rect.bottom - mapBounds.top + safe);
-      const bottomInset = Math.max(0, mapBounds.bottom - rect.top + safe);
-      const horizontal = rect.width < mapBounds.width * .62;
-      if (rect.top <= mapBounds.top + mapBounds.height * .45 && (!horizontal || rect.left <= mapBounds.left + safe)) top = Math.max(top, Math.ceil(topInset));
-      if (rect.bottom >= mapBounds.top + mapBounds.height * .55 && (!horizontal || rect.right >= mapBounds.right - safe)) bottom = Math.max(bottom, Math.ceil(bottomInset));
-      if (horizontal && rect.left > mapBounds.left + mapBounds.width * .42) right = Math.max(right, Math.ceil(mapBounds.right - rect.left + safe));
-      if (horizontal && rect.right < mapBounds.left + mapBounds.width * .58) left = Math.max(left, Math.ceil(rect.right - mapBounds.left + safe));
-    });
+  const overlays = [
+    [$(".map-tools"), "top"],
+    [$(".route-player"), "top"],
+    [$(".route-arrival"), "top"],
+    [$("#dayCard"), "bottom"],
+    [$("#mobileActionBar"), "bottom"],
+    [$(".map-legend"), "bottom"]
+  ];
+  overlays.forEach(([element, edge]) => {
+    if (element?.classList.contains("follow-marker")) return;
+    const rect = element?.getBoundingClientRect();
+    if (!rect || rect.width <= 0 || rect.height <= 0 || rect.right <= mapBounds.left || rect.left >= mapBounds.right || rect.bottom <= mapBounds.top || rect.top >= mapBounds.bottom) return;
+    if (edge === "top") top = Math.max(top, Math.ceil(rect.bottom - mapBounds.top + safe));
+    if (edge === "bottom") bottom = Math.max(bottom, Math.ceil(mapBounds.bottom - rect.top + safe));
+    const horizontal = rect.width < mapBounds.width * .62;
+    if (horizontal && rect.left > mapBounds.left + mapBounds.width * .42) right = Math.max(right, Math.ceil(mapBounds.right - rect.left + safe));
+    if (horizontal && rect.right < mapBounds.left + mapBounds.width * .58) left = Math.max(left, Math.ceil(rect.right - mapBounds.left + safe));
+  });
   return [top, right, bottom, left];
 }
 function scheduleMobileMapFit() {

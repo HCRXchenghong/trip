@@ -21,6 +21,7 @@ let routePlayerMarker = null, routePlayerLine = null, routePlayerFrame = 0;
 let mobileDrawerOpen = false;
 let mobileSheetOffset = null;
 const mobileSheetHandlePeek = 28;
+const isMobileLayout = () => window.matchMedia("(max-width: 760px)").matches;
 
 async function api(path) {
   const response = await fetch(path);
@@ -298,8 +299,7 @@ function centerPlace(place) {
   if (!place) return;
   if (!map) { toast("地图还在加载，稍后再长按一次"); return; }
   overview = false;
-  $("#mapScope").textContent = `${currentDay().label} 聚焦`;
-  $("#toggleMapFocus").textContent = "查看全程";
+  syncMapControls();
   map.setZoomAndCenter(10.5, coordinate(place));
   toast(`已定位：${place.name}`);
 }
@@ -424,7 +424,16 @@ function renderDates() {
     button.className = `date-button${index === activeIndex ? " active" : ""}`;
     button.setAttribute("aria-pressed", index === activeIndex ? "true" : "false");
     button.innerHTML = `<strong>${day.label}</strong><span>${day.route}</span>`;
-    button.onclick = () => { activeIndex = index; render(); };
+    button.onclick = () => {
+      activeIndex = index;
+      if (isMobileLayout()) {
+        overview = false;
+        mobileDrawerOpen = false;
+        mobileSheetOffset = null;
+      }
+      render();
+      if (isMobileLayout()) requestMapFitAfterMobileLayout();
+    };
     return button;
   }));
 }
@@ -521,12 +530,32 @@ function allRelevantLocations() {
 }
 function fitMap() {
   const targets = overview ? mapItems : activeMapItems;
-  if (targets.length) map.setFitView(targets, overview ? { top:72,right:360,bottom:70,left:40 } : { top:72,right:380,bottom:72,left:48 });
+  if (!targets.length || !map) return;
+  const avoid = isMobileLayout()
+    ? [18, 16, 132, 16]
+    : overview ? [72, 360, 70, 40] : [72, 380, 72, 48];
+  map.setFitView(targets, false, avoid);
+}
+function syncMapControls() {
+  const focused = !overview;
+  $("#mapScope").textContent = overview ? "全程总览" : `${currentDay().label} 聚焦`;
+  $("#toggleMapFocus").textContent = overview ? "聚焦当天" : "查看全程";
+  const mobileButton = $("#mobileFitDay");
+  if (mobileButton) {
+    mobileButton.textContent = overview ? "聚焦当天" : "查看全程";
+    mobileButton.classList.toggle("active", focused);
+    mobileButton.setAttribute("aria-pressed", String(focused));
+  }
+}
+function requestMapFitAfterMobileLayout() {
+  requestAnimationFrame(() => {
+    setMobileDrawer(false);
+    setTimeout(() => { if (map && !overview) fitMap(); }, 260);
+  });
 }
 function updateMapView() {
   fitMap();
-  $("#mapScope").textContent = overview ? "全程总览" : `${currentDay().label} 聚焦`;
-  $("#toggleMapFocus").textContent = overview ? "聚焦当天" : "查看全程";
+  syncMapControls();
 }
 function drawMap() {
   if (!map) return;
@@ -584,6 +613,19 @@ $("#nextRouteStep").onclick = nextRouteStep;
 $("#closeRouteArrival").onclick = stopRoutePlayer;
 $("#mobileShowCard").onclick = () => setMobileDrawer(!mobileDrawerOpen);
 $("#mobilePlayRoute").onclick = openRoutePreview;
-$("#mobileFitDay").onclick = () => { setMobileDrawer(false); overview = false; updateMapView(); };
+$("#mobileFitDay").onclick = () => {
+  overview = !overview;
+  updateMapView();
+  if (!overview) requestMapFitAfterMobileLayout();
+};
+window.addEventListener("resize", () => {
+  if (!map) return;
+  clearTimeout(window.travelMapResizeTimer);
+  window.travelMapResizeTimer = setTimeout(() => {
+    map.resize();
+    if (!overview) fitMap();
+    if (isMobileLayout()) setMobileDrawer(mobileDrawerOpen);
+  }, 120);
+});
 document.addEventListener("keydown", event => { if (event.key === "Escape") closeModal(); });
 init();

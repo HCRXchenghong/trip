@@ -265,7 +265,8 @@ button { font: inherit; cursor: pointer; }
 *::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 @media (max-width: 760px) {
-  .date-button.active { border-bottom-color: transparent !important; }
+  .date-button.active { border-bottom-color: #287452 !important; background: #e6f2e9; box-shadow: inset 0 -3px 0 #287452; }
+  .date-button.active strong { color: #174c36; }
   .date-nav { touch-action: pan-x; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
   .date-button, .mobile-action-bar button, .map-tools button, .card-drag-handle { -webkit-tap-highlight-color: transparent; }
   .card-actions { display: none; }
@@ -277,6 +278,10 @@ button { font: inherit; cursor: pointer; }
   .card-head, .card-drag-handle { touch-action: none; }
   .card-drag-handle { width: 100%; height: 20px; margin: -3px 0 3px; padding: 6px 0; }
   .card-drag-handle span { width: 35px; height: 4px; margin: 0 auto; }
+  .map-tools { max-width: calc(100% - 20px); padding: 7px 10px; }
+  .map-tools #toggleMapFocus { display: none; }
+  .mobile-action-bar button { background: #fff; color: #2b5745; }
+  .mobile-action-bar button.active { border-color: var(--forest); background: var(--forest); color: #fff; }
   .mobile-action-bar button { min-height: 44px; touch-action: manipulation; }
   .map-tools button { min-height: 40px; touch-action: manipulation; }
 }

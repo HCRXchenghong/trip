@@ -340,4 +340,6 @@ const server = createServer(async (req,res) => {
     json(res,404,{error:"未找到页面"});
   } catch (error) { console.error(error); json(res,500,{error:error.message || "服务器错误"}); }
 });
-const port=Number(process.env.PORT || 3030);server.listen(port,"127.0.0.1",()=>console.log(`旅行 plan 已启动：http://127.0.0.1:${port}`));
+const port=Number(process.env.PORT || 3030);
+const host=process.env.HOST || "127.0.0.1";
+server.listen(port,host,()=>console.log(`旅行 plan 已启动：http://${host}:${port}`));

@@ -12,13 +12,14 @@
   <main class="app-shell">
     <header class="topbar">
       <span class="brand">我和爱妻的旅行路线</span>
-      <button class="map-only-toggle" id="mapOnlyToggle" type="button">全屏地图</button>
     </header>
     <section class="workspace">
       <nav class="date-nav" id="dateNav" aria-label="选择日期"></nav>
+      <button class="panel-toggle dates-panel-toggle" id="toggleDates" type="button" aria-label="收起日期栏" title="收起日期栏">‹</button>
+      <button class="panel-toggle card-panel-toggle" id="toggleCard" type="button" aria-label="收起行程栏" title="收起行程栏">›</button>
       <section class="map-zone" aria-label="行程地图">
         <div class="map" id="map"></div>
-        <div class="map-tools" aria-label="地图范围控制"><span id="mapScope">全程总览</span><button id="toggleMapFocus">聚焦当天</button><button id="toggleDates">收起日期</button><button id="toggleCard">收起行程</button><button id="mapExitFullscreen" hidden>退出地图</button></div>
+        <div class="map-tools" aria-label="地图范围控制"><span id="mapScope">全程总览</span><button id="toggleMapFocus">聚焦当天</button></div>
         <div class="map-toast" id="mapToast" aria-live="polite"></div>
         <aside class="day-card" id="dayCard" aria-live="polite"></aside>
         <div class="mobile-action-bar" id="mobileActionBar" aria-label="移动端常用操作">

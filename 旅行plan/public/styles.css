@@ -22,7 +22,7 @@ button { font: inherit; cursor: pointer; }
 .map-status.ready { display: flex; align-items: center; gap: 6px; color: #287252; }
 .map-status.ready::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #3a9463; }
 
-.workspace { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 0; }
+.workspace { position: relative; display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 0; }
 .date-nav { overflow: auto; padding: 18px 14px; border-right: 1px solid var(--line); background: #fffefa; }
 .date-nav::before { content: "选择日期"; display: block; margin: 4px 10px 14px; color: #929892; font-size: 12px; font-weight: 700; letter-spacing: .14em; }
 .date-nav::after { content: "路线会随已买票、已订酒店和最终租车门店更新。"; display: block; margin: 24px 10px 0; padding: 13px 0; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.7; color: #7b8580; }
@@ -133,20 +133,19 @@ button { font: inherit; cursor: pointer; }
 .dialog-actions > * { flex: 1; padding: 11px; border: 0; border-radius: 8px; background: #eaf0e9; color: #234a3c; text-align: center; text-decoration: none; font-size: 13px; }
 .dialog-actions .primary { background: var(--forest); color: #fff; }
 
-.map-only-toggle { margin-left: auto; padding: 8px 12px; border: 1px solid #d8e2d9; border-radius: 8px; background: #f5faf5; color: #286148; font-size: 12px; }
-.map-only-toggle:hover { background: #eaf4ed; }
 .workspace { transition: grid-template-columns .24s ease; }
 .workspace.dates-collapsed { grid-template-columns: 0 minmax(0, 1fr); }
 .workspace.dates-collapsed .date-nav { overflow: hidden; width: 0; padding-right: 0; padding-left: 0; border-right: 0; opacity: 0; pointer-events: none; }
 .day-card { transition: transform .24s ease, opacity .24s ease; }
 .workspace.card-collapsed .day-card { transform: translateX(calc(100% + 34px)); opacity: 0; pointer-events: none; }
+.panel-toggle { position: absolute; z-index: 12; top: 50%; display: grid; width: 28px; height: 52px; place-items: center; padding: 0; border: 1px solid #dbe3dc; border-radius: 8px; background: #fffefa; box-shadow: 0 5px 16px #183d2c1f; color: #2b5745; font-size: 25px; line-height: 1; transform: translateY(-50%); transition: left .24s ease, right .24s ease, background .18s ease; }
+.panel-toggle:hover { background: #edf4ef; }
+.dates-panel-toggle { left: 234px; }
+.card-panel-toggle { right: 344px; }
+.workspace.dates-collapsed .dates-panel-toggle { left: 8px; }
+.workspace.card-collapsed .card-panel-toggle { right: 8px; }
 .map-tools { flex-wrap: wrap; }
 .map-tools button { white-space: nowrap; }
-.app-shell.map-fullscreen .topbar, .app-shell.map-fullscreen .date-nav { display: none; }
-.app-shell.map-fullscreen .workspace { position: fixed; z-index: 50; inset: 0; display: block; }
-.app-shell.map-fullscreen .map-zone { height: 100vh; }
-.app-shell.map-fullscreen .map-tools { top: 18px; left: 18px; }
-.map-tools button[hidden] { display: none; }
 
 .route-player, .route-arrival { position: absolute; z-index: 18; left: 50%; transform: translateX(-50%); width: min(300px, calc(100% - 32px)); padding: 14px 16px; border: 1px solid #ffffff; border-radius: 15px; background: #fffefbf2; box-shadow: 0 14px 36px #183d2c30; }
 .route-player { top: 74px; }
@@ -200,7 +199,7 @@ button { font: inherit; cursor: pointer; }
   .app-shell { height: 100dvh; min-height: 580px; grid-template-rows: 58px 1fr; }
   .topbar { padding: 0 16px; }
   .brand { font-size: 23px; }
-  .subtitle, .map-status, .map-only-toggle { display: none; }
+  .subtitle, .map-status { display: none; }
   .workspace { grid-template-columns: 1fr; grid-template-rows: 44px minmax(0, 1fr); }
   .date-nav { display: flex; gap: 4px; overflow: auto; padding: 5px 8px; border-right: 0; border-bottom: 1px solid var(--line); }
   .date-nav::before, .date-nav::after { display: none; }
@@ -223,7 +222,7 @@ button { font: inherit; cursor: pointer; }
   .card-actions button { min-width: calc(50% - 4px); }
   .card-actions .primary { min-width: 100%; }
   .map-tools { top: 12px; left: 12px; }
-  .map-tools #toggleDates, .map-tools #toggleCard, .map-tools #mapExitFullscreen { display: none; }
+  .panel-toggle { display: none; }
   .map-legend { right: 12px; bottom: calc(50% + 14px); left: auto; justify-content: flex-end; max-width: 260px; }
   .map-help { display: none; }
   .route-player { top: 61px; }

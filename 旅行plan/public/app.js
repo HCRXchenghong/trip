@@ -44,14 +44,15 @@ function setPanelCollapsed(panel, collapsed) {
   const workspace = $(".workspace");
   workspace.classList.toggle("dates-collapsed", panel === "dates" ? collapsed : workspace.classList.contains("dates-collapsed"));
   workspace.classList.toggle("card-collapsed", panel === "card" ? collapsed : workspace.classList.contains("card-collapsed"));
-  $("#toggleDates").textContent = workspace.classList.contains("dates-collapsed") ? "展开日期" : "收起日期";
-  $("#toggleCard").textContent = workspace.classList.contains("card-collapsed") ? "展开行程" : "收起行程";
-}
-function setMapFullscreen(fullscreen) {
-  $(".app-shell").classList.toggle("map-fullscreen", fullscreen);
-  $("#mapOnlyToggle").textContent = fullscreen ? "退出地图" : "全屏地图";
-  $("#mapExitFullscreen").hidden = !fullscreen;
-  if (map) setTimeout(() => map.resize(), 30);
+  const datesCollapsed = workspace.classList.contains("dates-collapsed");
+  const cardCollapsed = workspace.classList.contains("card-collapsed");
+  const datesButton = $("#toggleDates"), cardButton = $("#toggleCard");
+  datesButton.textContent = datesCollapsed ? "›" : "‹";
+  datesButton.setAttribute("aria-label", datesCollapsed ? "展开日期栏" : "收起日期栏");
+  datesButton.title = datesButton.getAttribute("aria-label");
+  cardButton.textContent = cardCollapsed ? "‹" : "›";
+  cardButton.setAttribute("aria-label", cardCollapsed ? "展开行程栏" : "收起行程栏");
+  cardButton.title = cardButton.getAttribute("aria-label");
 }
 function setMobileDrawer(open) {
   const card = $("#dayCard");
@@ -190,7 +191,7 @@ function stopRoutePlayer() {
   routePlayer.active = false; clearRoutePlayerMap(); routePlayer.segments = []; routePlayer.index = -1;
   $(".map-zone")?.classList.remove("route-playing");
   $("#routePlayer").hidden = true; $("#routeArrival").hidden = true;
-  if (map && !$(".app-shell").classList.contains("map-fullscreen")) updateMapView();
+  if (map) updateMapView();
 }
 function nextRouteStep() {
   if (!routePlayer.active) return;
@@ -620,8 +621,6 @@ $("#photoLightbox").onclick = event => { if (event.target === $("#photoLightbox"
 $("#toggleMapFocus").onclick = () => { overview = !overview; updateMapView(); };
 $("#toggleDates").onclick = () => setPanelCollapsed("dates", !$(".workspace").classList.contains("dates-collapsed"));
 $("#toggleCard").onclick = () => setPanelCollapsed("card", !$(".workspace").classList.contains("card-collapsed"));
-$("#mapOnlyToggle").onclick = () => setMapFullscreen(!$(".app-shell").classList.contains("map-fullscreen"));
-$("#mapExitFullscreen").onclick = () => setMapFullscreen(false);
 $("#closeRoutePreview").onclick = closeRoutePreview;
 $("#routePreviewModal").onclick = event => { if (event.target === $("#routePreviewModal")) closeRoutePreview(); };
 $("#startRoutePlayer").onclick = startRoutePlayer;

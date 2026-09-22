@@ -77,7 +77,7 @@ db.exec(`
 function seed() {
   if (db.prepare("SELECT COUNT(*) AS count FROM trips").get().count) return;
   db.prepare("INSERT INTO trips (id,title,subtitle,start_date,end_date) VALUES (1,?,?,?,?)")
-    .run("我和爱妻的旅行路线", "烟台 · 哈尔滨 · 齐齐哈尔 · 呼伦贝尔", "2026-10-02", "2026-10-08");
+    .run("特种兵旅行之我要去大兴安岭", "烟台 · 哈尔滨 · 齐齐哈尔 · 呼伦贝尔", "2026-10-02", "2026-10-08");
   const putLocation = db.prepare("INSERT INTO locations (id,name,address,lng,lat,photo_query) VALUES (?,?,?,?,?,?)");
   const locations = [
     [1,"哈尔滨太平国际机场","黑龙江省哈尔滨市道里区太平镇",126.250,45.623,"哈尔滨太平国际机场"],
@@ -121,7 +121,7 @@ function seed() {
 seed();
 
 // 10 月 3 日齐齐哈尔取车，先走呼伦贝尔北线，最后两天压到阿尔山，10 月 8 日回齐齐哈尔还车。
-const itineraryVersion = "qiqihar-rental-northline-aershan-2026-09-22-v8";
+const itineraryVersion = "qiqihar-rental-northline-aershan-2026-09-23-v9";
 function refreshNorthlineDraft() {
   const savedVersion = db.prepare("SELECT value FROM app_meta WHERE key='itinerary_version'").get()?.value;
   if (savedVersion === itineraryVersion) return;
@@ -193,7 +193,7 @@ function refreshNorthlineDraft() {
   db.exec("BEGIN");
   try {
     db.exec("DELETE FROM segments; DELETE FROM stops; DELETE FROM days; DELETE FROM locations; DELETE FROM trips;");
-    putTrip.run("我和爱妻的旅行路线", "阿尔山火山森林 · 呼伦贝尔草原与湿地", "2026-10-02", "2026-10-08");
+    putTrip.run("特种兵旅行之我要去大兴安岭", "阿尔山火山森林 · 呼伦贝尔草原与湿地", "2026-10-02", "2026-10-08");
     locations.forEach(row => putLocation.run(...row)); days.forEach(row => putDay.run(...row)); stops.forEach((row,index) => putStop.run(index + 1,...row)); segments.forEach(row => putSegment.run(...row));
     db.prepare("INSERT OR REPLACE INTO app_meta (key,value) VALUES ('itinerary_version',?)").run(itineraryVersion);
     db.exec("COMMIT");

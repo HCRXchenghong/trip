@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#133e32">
+  <title>阿尔山呼伦贝尔旅行路线</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23133e32'/%3E%3Cpath d='M12 45 28 17l9 15 7-10 10 23Z' fill='%23d59a2d'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <button class="map-only-toggle" id="mapOnlyToggle" type="button">全屏地图</button>
+    </header>
+    <section class="workspace">
+      <nav class="date-nav" id="dateNav" aria-label="选择日期"></nav>
+      <section class="map-zone" aria-label="行程地图">
+        <div class="map" id="map"></div>
+        <div class="map-tools" aria-label="地图范围控制"><span id="mapScope">全程总览</span><button id="toggleMapFocus">聚焦当天</button><button id="toggleDates">收起日期</button><button id="toggleCard">收起行程</button><button id="mapExitFullscreen" hidden>退出地图</button></div>
+        <div class="map-toast" id="mapToast" aria-live="polite"></div>
+        <aside class="day-card" id="dayCard" aria-live="polite"></aside>
+        <div class="mobile-action-bar" id="mobileActionBar" aria-label="移动端常用操作">
+          <button id="mobileShowCard" type="button">行程</button>
+          <button id="mobilePlayRoute" type="button">动态线路</button>
+          <button id="mobileFitDay" type="button">聚焦当天</button>
+        </div>
+        <div class="map-legend" aria-label="交通方式图例"><span class="flight">飞机</span><span class="rail">火车</span><span class="drive">租车自驾</span><span class="walk">步行</span><span class="taxi">打车</span></div>
+        <p class="map-help">全程灰显；选中日期后，该日路线与节点高亮。点击线路看距离，点击卡片看详情，长按卡片可定位地点。</p>
+        <div class="config-panel" id="configPanel" hidden>
+          <h2>还差高德地图配置</h2>
+          <p>复制 <code>.env.example</code> 为 <code>.env</code>，填入高德 Web 端 JS API Key 后重启服务。</p>
+        </div>
+        <section class="route-player" id="routePlayer" hidden aria-live="polite">
+          <div class="route-player-head"><span class="route-player-kicker">动态线路</span><button id="stopRoutePlayer" type="button">退出播放</button></div>
+          <div class="route-player-progress"><span id="routePlayerProgress"></span></div>
+          <div class="route-player-current"><img id="routePlayerIcon" alt="交通方式"><div><strong id="routePlayerMode"></strong><span id="routePlayerSegment"></span></div></div>
+          <p id="routePlayerHint">正在前往下一站…</p>
+        </section>
+        <section class="route-arrival" id="routeArrival" hidden aria-live="polite">
+          <p class="route-arrival-kicker" id="routeArrivalKicker">已到达</p>
+          <h2 id="routeArrivalTitle"></h2>
+          <p id="routeArrivalDetail"></p>
+          <div class="route-arrival-actions"><button id="nextRouteStep" class="primary" type="button">下一站</button><button id="closeRouteArrival" type="button">停在这里</button></div>
+        </section>
+        <section class="route-preview-modal" id="routePreviewModal" hidden role="dialog" aria-modal="true" aria-labelledby="routePreviewTitle">
+          <div class="route-preview-dialog">
+            <button class="close" id="closeRoutePreview" aria-label="关闭">×</button>
+            <p class="dialog-label">沉浸式路线</p>
+            <h2 id="routePreviewTitle">播放当天动态线路</h2>
+            <p class="route-preview-copy" id="routePreviewCopy"></p>
+            <div class="route-preview-grid">
+              <div class="route-preview-card"><img src="/assets/route-icons/car.png" alt="汽车"><strong>汽车</strong><span>自驾段</span></div>
+              <div class="route-preview-card"><img src="/assets/route-icons/plane.png" alt="飞机"><strong>飞机</strong><span>飞行段</span></div>
+              <div class="route-preview-card"><img src="/assets/route-icons/train.png" alt="火车"><strong>火车</strong><span>铁路段</span></div>
+            </div>
+            <p class="route-preview-note">播放时会按当天真实交通方式自动切换图标，地图将快速移动到每个地点并等待你点击“下一站”。</p>
+            <button class="route-preview-start" id="startRoutePlayer" type="button">开始播放</button>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+  <div class="modal" id="placeModal" role="dialog" aria-modal="true" aria-labelledby="placeTitle" hidden>
+    <section class="dialog"><div class="dialog-inner">
+      <button class="close" id="closeModal" aria-label="关闭">×</button>
+      <p class="dialog-label" id="placeLabel"></p>
+      <h2 id="placeTitle"></h2>
+      <p class="address" id="placeAddress"></p>
+      <p class="route-metrics" id="routeMetrics"></p>
+      <div class="photo-gallery" id="photoGallery" aria-label="十月实拍图"></div>
+      <p class="place-note" id="placeNote"></p>
+      <div class="dialog-actions"><a class="primary" id="navigateLink" target="_blank" rel="noopener noreferrer">高德导航</a><button id="secondaryAction">关闭</button></div>
+    </div></section>
+  </div>
+  <div class="photo-lightbox" id="photoLightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxCaption" hidden>
+    <section class="photo-lightbox-dialog">
+      <button class="close" id="closePhotoLightbox" aria-label="关闭放大图片">×</button>
+      <img id="lightboxImage" alt="">
+      <p id="lightboxCaption"></p>
+      <div class="dialog-actions"><a class="primary" id="lightboxSource" target="_blank" rel="noopener noreferrer">查看图片出处</a><button id="lightboxBack">返回地点</button></div>
+    </section>
+  </div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
